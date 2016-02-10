@@ -20,3 +20,47 @@ When the DLRS server is running, open the following page to test:
 ```
 http://localhost:8678/learn
 ```
+# API Usage
+DLRS exposes a few endpoints for your apps to store and retrieve atomic user activities. Every 'measurable' user activity is represented by a 'Statement' or action. 
+
+A 'Statement' can be sent to a DLRS with 3 primary payload details:
+
+* *Actor* - Who is this user?
+* *Verb* - What did he do?
+* *Object* - What is he learning?
+
+## To record a statement
+Send a POST request
+
+```
+POST /learn/statement
+```
+with the following JSON request body:
+
+```json
+{
+    "version": "1.0.0",
+    "id": "d1eec41f-1e93-4ed6-acbf-5c4bd0c24269",
+    "actor": {
+        "objectType": "Agent",
+        "name": "Joe Schmoe",
+        "mbox": "mailto:joe@example.com"
+    },
+    "verb": {
+        "id": "http://adlnet.gov/expapi/verbs/completed",
+        "display": {
+            "en-US": "completed"
+        }
+    },
+    "object": {
+        "objectType": "Activity",
+        "id": "http://www.example.com/activities/001",
+        "definition": {
+            "name": {
+                "en-US": "Example Activity"
+            },
+            "type": "http://adlnet.gov/expapi/activities/course"
+        }
+    }
+}
+```
