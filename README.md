@@ -30,7 +30,7 @@ A 'Statement' can be sent to a DLRS with 3 primary payload details:
 * *Object* - What is he learning?
 
 ## To record a statement
-Send a POST request
+To record a Statement, send a POST request.
 
 ```http
 POST /learn/statement
@@ -60,5 +60,33 @@ with the following JSON request body:
             "type": "http://adlnet.gov/expapi/activities/course"
         }
     }
+}
+```
+This API returns a Statement ID.
+
+## To get a statement
+To get details about a statement from the Statement ID, send a GET request.
+
+```http
+GET /learn/statement/<STATEMENT ID>
+```
+
+For example:
+
+```http
+GET /learn/statement/a29f2f75-37cb-44b8-83fc-54a812a1d018
+```
+
+Example success response:
+
+```json
+{
+   "Statement":[
+      "a29f2f75-37cb-44b8-83fc-54a812a1d018",
+      "{\"objectType\":\"Agent\",\"name\":\"Joe Schmoe\",\"mbox\":\"mailto:joe@example.com\"}",
+      "{\"id\":\"http://adlnet.gov/expapi/verbs/completed\",\"display\":{\"en-US\":\"completed\"}}",
+      "{\"objectType\":\"Activity\",\"id\":\"http://www.example.com/activities/001\",\"definition\":{\"name\":{\"en-US\":\"Example Activity\"},\"type\":\"http://adlnet.gov/expapi/activities/course\"}}",
+      1455111694507
+   ]
 }
 ```
