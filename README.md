@@ -103,9 +103,9 @@ with the following JSON request body:
 {
     
     "actor": {
-        "objectType": "Agent",
-        "name": "Joe Schmoe",
-        "mbox": "mailto:joe@example.com"
+        "objectType": "User",
+        "name": "Abel Osbert",
+        "mbox": "mailto:aosbert@example.com"
     }
 }
 ```
