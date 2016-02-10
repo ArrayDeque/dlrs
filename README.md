@@ -32,19 +32,17 @@ A 'Statement' can be sent to a DLRS with 3 primary payload details:
 ## To record a statement
 Send a POST request
 
-```
+```http
 POST /learn/statement
 ```
 with the following JSON request body:
 
 ```json
 {
-    "version": "1.0.0",
-    "id": "d1eec41f-1e93-4ed6-acbf-5c4bd0c24269",
     "actor": {
-        "objectType": "Agent",
-        "name": "Joe Schmoe",
-        "mbox": "mailto:joe@example.com"
+        "objectType": "User",
+        "name": "Abel Osbert",
+        "mbox": "mailto:aosbert@example.com"
     },
     "verb": {
         "id": "http://adlnet.gov/expapi/verbs/completed",
