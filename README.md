@@ -15,3 +15,8 @@ To test DLRS, directly run:
 ```
 $ ./gradlew run
 ```
+When the DLRS server is running, open the following page to test:
+
+```
+http://localhost:8678/learn
+```
