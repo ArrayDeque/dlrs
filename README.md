@@ -90,3 +90,36 @@ Example success response:
    ]
 }
 ```
+
+## To find all statements for an actor
+To find all statements for an actor, send a POST request.
+
+```http
+POST /learn/statement/findstatementsforactor
+```
+with the following JSON request body:
+
+```json
+{
+    
+    "actor": {
+        "objectType": "Agent",
+        "name": "Joe Schmoe",
+        "mbox": "mailto:joe@example.com"
+    }
+}
+```
+
+Example success response:
+
+```json
+{"Statements": [
+    "36318877-208c-4ab5-a42b-a1ca3f45ca52",
+    "e2cd0c7a-a2e6-451c-b2ef-7fdb8031bef7",
+    "5ba063d8-61c3-4200-8326-eaa6f566e353",
+    "e2bf61b9-dd8f-4ece-97d3-094e57f35cad",
+    "5daa8b09-d982-42e6-9236-5883da2da08f",
+    "25017371-1d76-4134-be23-79938c4050a9",
+    "a29f2f75-37cb-44b8-83fc-54a812a1d018"
+]}
+```
