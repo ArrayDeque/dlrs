@@ -123,3 +123,5 @@ Example success response:
     "a29f2f75-37cb-44b8-83fc-54a812a1d018"
 ]}
 ```
+
+Every Statement denotes a discreet, recorded, learning action of the user. Use ```findstatementsforactor``` endpoint to get the Statement details. Note that you can pass any JSON payload as part of actor, verb, and object.
