@@ -1,7 +1,7 @@
 # DLRS
 DLRS (Distributed Learning Record Store) allows you to quickly record and retrieve discreet learning activities of users. DLRS is not an LRS ([Learning Record Store](https://tincanapi.com/learning-record-store/)) but is heavily based on the 'Statement' concept of LRS. DLRS is not written conforming to the LRS specification so obviously, it won't work with applications supporting the xAPI/LRS. DLRS was quickly written to act as a dandy and lightweight record store to store all user learning activities.
 
-This software is still under development. Don't even think of using it in production.
+This software is still under development. Don't even think of using DLRS in production (for now).
 
 ## How to test DLRS
 
