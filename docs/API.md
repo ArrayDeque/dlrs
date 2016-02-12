@@ -10,6 +10,7 @@ A 'Statement' can be sent to a DLRS with 3 primary payload details:
 Available endpoints:
 * [**POST /learn/statement**](To record a statement)
 * [**GET /learn/statement/<STATEMENTID>**](To get a statement)
+* [**GET /learn/findtimeofstatement/<STATEMENTID>**](To get the statement time)
 * [**POST /learn/statement/findstatementsforactor**](To find all statements for an actor)
 
 ## To record a statement
@@ -223,6 +224,87 @@ $request = new http\Client\Request;
 $request->setRequestUrl('http://127.0.0.1:8678/learn/statement/9e746713-055e-45de-a1d0-6044509bc52d');
 $request->setRequestMethod('GET');
 $request->setHeaders(array(
+  'cache-control' => 'no-cache',
+  'content-type' => 'application/json'
+));
+
+$client->enqueue($request)->send();
+$response = $client->getResponse();
+
+echo $response->getBody();
+```
+
+## To get the statement time
+**Case -** I need to know when the user performed an activity.
+
+To get the statement creation time, send a GET request.
+
+```http
+GET /learn/findtimeofstatement/<STATEMENT ID>
+```
+
+For example:
+
+```http
+GET /learn/findtimeofstatement/a29f2f75-37cb-44b8-83fc-54a812a1d018
+```
+
+Example success response:
+
+```json
+{"Statement Time": "Feb 12,2016 19:11"}
+```
+A JavaScript example:
+
+```javascript
+var settings = {
+  "async": true,
+  "crossDomain": true,
+  "url": "http://127.0.0.1:8678/learn/findtimeofstatement/fdcfa8aa-9214-4a56-ade5-f9e655fcdbeb",
+  "method": "GET",
+  "headers": {
+    "content-type": "application/json",
+    "cache-control": "no-cache"
+  }
+}
+
+$.ajax(settings).done(function (response) {
+  console.log(response);
+});
+```
+A Python example:
+
+```python
+import http.client
+
+conn = http.client.HTTPConnection("127.0.0.1:8678")
+
+headers = {
+    'content-type': "application/json",
+    'cache-control': "no-cache",
+    'postman-token': "276654ff-f336-5fcd-eefa-00305bf667c1"
+    }
+
+conn.request("GET", "/learn/findtimeofstatement/fdcfa8aa-9214-4a56-ade5-f9e655fcdbeb", headers=headers)
+
+res = conn.getresponse()
+data = res.read()
+
+print(data.decode("utf-8"))
+```
+
+A PHP example:
+
+```php
+<?php
+
+$client = new http\Client;
+$request = new http\Client\Request;
+
+$request->setRequestUrl('http://127.0.0.1:8678/learn/findtimeofstatement/fdcfa8aa-9214-4a56-ade5-f9e655fcdbeb');
+$request->setRequestMethod('GET');
+$request->setHeaders(array(
+  'postman-token' => '3365320b-0279-3c90-e0f7-1667ea862fbd',
   'cache-control' => 'no-cache',
   'content-type' => 'application/json'
 ));
