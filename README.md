@@ -14,7 +14,7 @@ $ gradle assemble
 or:
 
 ```
-$ gradle assemble
+$ gradle build
 ```
 
 You need to have [Java SE 1.8](http://www.oracle.com/technetwork/java/javase/downloads/index.html) or higher and [Gradle](http://gradle.org).
