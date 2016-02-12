@@ -44,6 +44,27 @@ with the following JSON request body:
 ```
 This API returns a Statement ID.
 
+A JavaScript example:
+
+```javascript
+var settings = {
+  "async": true,
+  "crossDomain": true,
+  "url": "http://127.0.0.1:8678/learn/statement",
+  "method": "POST",
+  "headers": {
+    "content-type": "application/json",
+    "cache-control": "no-cache"
+  },
+  "processData": false,
+  "data": "{\n\"actor\": {\n\"name\":\"Sally\",\n\"mbox\":\"mailto:sally@example.com\"\n},\n\"verb\":{\n\"id\":\"http://adlnet.gov/expapi/verbs/experienced\",\n\"display\":{\"en-US\":\"experienced\"}\n},\n\"object\":{\n\"id\":\"http://example.com/activities/solo-hang-gliding\",\n\"definition\": {\n\"name\": {\"en-US\":\"Hitchhiking\" }\n}\n}\n}"
+}
+
+$.ajax(settings).done(function (response) {
+  console.log(response);
+});
+```
+
 A Python example:
 
 ```python
@@ -135,7 +156,24 @@ Example success response:
   ]
 }
 ```
+A JavaScript example:
 
+```javascript
+var settings = {
+  "async": true,
+  "crossDomain": true,
+  "url": "http://127.0.0.1:8678/learn/statement/9e746713-055e-45de-a1d0-6044509bc52d",
+  "method": "GET",
+  "headers": {
+    "content-type": "application/json",
+    "cache-control": "no-cache"
+  }
+}
+
+$.ajax(settings).done(function (response) {
+  console.log(response);
+});
+```
 A Python example:
 
 ```python
