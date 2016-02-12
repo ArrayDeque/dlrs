@@ -43,5 +43,5 @@ When the DLRS server is running, open the following page to test:
 ```
 http://localhost:8678/learn
 ```
-## API Usage
+## Using
 For building clients that can work with DLRS, see the [Developer Guide](http://fermatjen.github.io/dlrs/).
