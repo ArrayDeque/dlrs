@@ -103,3 +103,82 @@ Example success response:
 ```
 
 Every Statement denotes a discreet, recorded, learning action of the user. Use ```findstatementsforactor``` endpoint to get the Statement details. Note that you can pass any JSON payload as part of actor, verb, and object.
+
+A Python example:
+
+```python
+import http.client
+
+conn = http.client.HTTPConnection("127.0.0.1:8678")
+
+headers = {
+    'content-type': "application/json",
+    'cache-control': "no-cache"
+    }
+
+conn.request("GET", "/learn/statement/9e746713-055e-45de-a1d0-6044509bc52d", headers=headers)
+
+res = conn.getresponse()
+data = res.read()
+
+print(data.decode("utf-8"))
+```
+
+A PHP example:
+
+```php
+<?php
+
+$curl = curl_init();
+
+curl_setopt_array($curl, array(
+  CURLOPT_PORT => "8678",
+  CURLOPT_URL => "http://127.0.0.1:8678/learn/findstatementsforactor",
+  CURLOPT_RETURNTRANSFER => true,
+  CURLOPT_ENCODING => "",
+  CURLOPT_MAXREDIRS => 10,
+  CURLOPT_TIMEOUT => 30,
+  CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+  CURLOPT_CUSTOMREQUEST => "POST",
+  CURLOPT_POSTFIELDS => "{\n    \"actor\": {\n        \"name\": \"Sally Glider\",\n        \"mbox\": \"mailto:sally@example.com\"\n     },\n     \"verb\": {\n         \"id\": \"http://adlnet.gov/expapi/verbs/experienced\",\n         \"display\": {\"en-US\": \"experienced\"}\n         },\n     \"object\": {\n         \"id\": \"http://example.com/activities/solo-hang-gliding\",\n         \"definition\": {\n             \"name\": { \"en-US\": \"Solo Hang Gliding\" }\n         }\n     }\n}",
+  CURLOPT_HTTPHEADER => array(
+    "cache-control: no-cache",
+    "content-type: application/json",
+    "postman-token: ab1722ac-39c2-7bb8-7a8f-ce493248b7ab"
+  ),
+));
+
+$response = curl_exec($curl);
+$err = curl_error($curl);
+
+curl_close($curl);
+
+if ($err) {
+  echo "cURL Error #:" . $err;
+} else {
+  echo $response;
+}
+```
+
+Or, simply cURL it up:
+
+```curl
+curl -X POST -H "Content-Type: application/json" -H "Cache-Control: no-cache"
+ -d '{
+    "actor": {
+        "name": "Sally Glider",
+        "mbox": "mailto:sally@example.com"
+     },
+     "verb": {
+         "id": "http://adlnet.gov/expapi/verbs/experienced",
+         "display": {"en-US": "experienced"}
+         },
+     "object": {
+         "id": "http://example.com/activities/solo-hang-gliding",
+         "definition": {
+             "name": { "en-US": "Solo Hang Gliding" }
+         }
+     }
+}' "http://127.0.0.1:8678/learn/findstatementsforactor"
+```
+
