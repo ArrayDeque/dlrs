@@ -5,6 +5,14 @@ This software is still under development. Don't even think of using DLRS in prod
 
 ## How to test DLRS
 
+Before you begin, [install Gradle](https://docs.gradle.org/current/userguide/installation.html) for your platform.
+
+On Mac, it is as simple as:
+
+```shell
+$brew install gradle
+```
+
 To build DLRS from the sources, run:
 
 ```
@@ -17,9 +25,9 @@ or:
 $ gradle build
 ```
 
-You need to have [Java SE 1.8](http://www.oracle.com/technetwork/java/javase/downloads/index.html) or higher and [Gradle](http://gradle.org).
+You need to have [Java SE 1.8](http://www.oracle.com/technetwork/java/javase/downloads/index.html) or higher and [Gradle](http://gradle.org). 
 
-If you just want to test DLRS without building the sources, directly run:
+If you just want to test DLRS without building DLRS from the sources, directly run:
 
 ```
 $ ./gradlew run
