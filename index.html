@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="UTF-8">
+    <title>DLRS Developer Guide by fermatjen</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="stylesheets/normalize.css" media="screen">
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-light.css" media="screen">
+  </head>
+  <body>
+    <section class="page-header">
+      <h1 class="project-name">DLRS Developer Guide</h1>
+      <h2 class="project-tagline">A realtime distributed learning record store</h2>
+      <a href="https://github.com/fermatjen/dlrs" class="btn">View on GitHub</a>
+      <a href="https://github.com/fermatjen/dlrs/zipball/master" class="btn">Download .zip</a>
+      <a href="https://github.com/fermatjen/dlrs/tarball/master" class="btn">Download .tar.gz</a>
+    </section>
+
+    <section class="main-content">
+      <h1>
+<a id="developer-guide" class="anchor" href="#developer-guide" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Developer Guide</h1>
+
+<p>DLRS exposes a few endpoints for your apps to store and retrieve atomic user activities. Every 'measurable' user activity is represented by a 'Statement' or action. </p>
+
+<p>A 'Statement' can be sent to a DLRS with 3 primary payload details:</p>
+
+<ul>
+<li>
+<strong>Actor</strong> - Who is this user?</li>
+<li>
+<strong>Verb</strong> - What did he do?</li>
+<li>
+<strong>Object</strong> - What is he learning?</li>
+</ul>
+
+<h2>
+<a id="to-record-a-statement" class="anchor" href="#to-record-a-statement" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>To record a statement</h2>
+
+<p><strong>Case -</strong> A user is going through a learning activity and I want to record what he is doing so I can analyze the progress later.</p>
+
+<p>To record a Statement, send a POST request.</p>
+
+<div class="highlight highlight-source-httpspec"><pre><span class="pl-k">POST</span><span class="pl-c1"> /learn/statement</span></pre></div>
+
+<p>with the following JSON request body:</p>
+
+<div class="highlight highlight-source-json"><pre>{
+  <span class="pl-s"><span class="pl-pds">"</span>actor<span class="pl-pds">"</span></span>: {
+    <span class="pl-s"><span class="pl-pds">"</span>objectType<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>User<span class="pl-pds">"</span></span>,
+    <span class="pl-s"><span class="pl-pds">"</span>name<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>Abel Osbert<span class="pl-pds">"</span></span>,
+    <span class="pl-s"><span class="pl-pds">"</span>mbox<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>mailto:aosbert@example.com<span class="pl-pds">"</span></span>
+  },
+  <span class="pl-s"><span class="pl-pds">"</span>verb<span class="pl-pds">"</span></span>: {
+    <span class="pl-s"><span class="pl-pds">"</span>id<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>http://adlnet.gov/expapi/verbs/completed<span class="pl-pds">"</span></span>,
+    <span class="pl-s"><span class="pl-pds">"</span>display<span class="pl-pds">"</span></span>: {
+      <span class="pl-s"><span class="pl-pds">"</span>en-US<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>completed<span class="pl-pds">"</span></span>
+    }
+  },
+  <span class="pl-s"><span class="pl-pds">"</span>object<span class="pl-pds">"</span></span>: {
+    <span class="pl-s"><span class="pl-pds">"</span>objectType<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>Activity<span class="pl-pds">"</span></span>,
+    <span class="pl-s"><span class="pl-pds">"</span>id<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>http://www.example.com/activities/001<span class="pl-pds">"</span></span>,
+    <span class="pl-s"><span class="pl-pds">"</span>definition<span class="pl-pds">"</span></span>: {
+      <span class="pl-s"><span class="pl-pds">"</span>name<span class="pl-pds">"</span></span>: {
+        <span class="pl-s"><span class="pl-pds">"</span>en-US<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>Example Activity<span class="pl-pds">"</span></span>
+      },
+    <span class="pl-s"><span class="pl-pds">"</span>type<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>http://adlnet.gov/expapi/activities/course<span class="pl-pds">"</span></span>
+    }
+  }
+}</pre></div>
+
+<p>This API returns a Statement ID.</p>
+
+<p>Note that DLRS looks for 3 JSON fragments:</p>
+
+<div class="highlight highlight-source-java"><pre>  <span class="pl-smi">JSONObject</span> actorJSON <span class="pl-k">=</span> jsonObject<span class="pl-k">.</span>getJSONObject(<span class="pl-s"><span class="pl-pds">"</span>actor<span class="pl-pds">"</span></span>);
+  <span class="pl-smi">JSONObject</span> verbJSON <span class="pl-k">=</span> jsonObject<span class="pl-k">.</span>getJSONObject(<span class="pl-s"><span class="pl-pds">"</span>verb<span class="pl-pds">"</span></span>);
+  <span class="pl-smi">JSONObject</span> objectJSON <span class="pl-k">=</span> jsonObject<span class="pl-k">.</span>getJSONObject(<span class="pl-s"><span class="pl-pds">"</span>object<span class="pl-pds">"</span></span>);</pre></div>
+
+<p>So, ensure that the JSON payload in the request body is well-formed and contains these 3 mandatory fragments - actor, verb, and object.</p>
+
+<p>When you record a statement, the statement is stored in an in-memory TreeMap that gets persisted to disk when JVM shuts down. Statements are not immediately written to disk. Hence, you need to do a clean server shut down to activate the JVM shutdown hooks that will write the TreeMaps to disk.</p>
+
+<p>A JavaScript example:</p>
+
+<div class="highlight highlight-source-js"><pre><span class="pl-k">var</span> settings <span class="pl-k">=</span> {
+  <span class="pl-s"><span class="pl-pds">"</span>async<span class="pl-pds">"</span></span><span class="pl-k">:</span> <span class="pl-c1">true</span>,
+  <span class="pl-s"><span class="pl-pds">"</span>crossDomain<span class="pl-pds">"</span></span><span class="pl-k">:</span> <span class="pl-c1">true</span>,
+  <span class="pl-s"><span class="pl-pds">"</span>url<span class="pl-pds">"</span></span><span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">"</span>http://127.0.0.1:8678/learn/statement<span class="pl-pds">"</span></span>,
+  <span class="pl-s"><span class="pl-pds">"</span>method<span class="pl-pds">"</span></span><span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">"</span>POST<span class="pl-pds">"</span></span>,
+  <span class="pl-s"><span class="pl-pds">"</span>headers<span class="pl-pds">"</span></span><span class="pl-k">:</span> {
+    <span class="pl-s"><span class="pl-pds">"</span>content-type<span class="pl-pds">"</span></span><span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">"</span>application/json<span class="pl-pds">"</span></span>,
+    <span class="pl-s"><span class="pl-pds">"</span>cache-control<span class="pl-pds">"</span></span><span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">"</span>no-cache<span class="pl-pds">"</span></span>
+  },
+  <span class="pl-s"><span class="pl-pds">"</span>processData<span class="pl-pds">"</span></span><span class="pl-k">:</span> <span class="pl-c1">false</span>,
+  <span class="pl-s"><span class="pl-pds">"</span>data<span class="pl-pds">"</span></span><span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">"</span>{<span class="pl-cce">\n\"</span>actor<span class="pl-cce">\"</span>: {<span class="pl-cce">\n\"</span>name<span class="pl-cce">\"</span>:<span class="pl-cce">\"</span>Sally<span class="pl-cce">\"</span>,<span class="pl-cce">\n\"</span>mbox<span class="pl-cce">\"</span>:<span class="pl-cce">\"</span>mailto:sally@example.com<span class="pl-cce">\"\n</span>},<span class="pl-cce">\n\"</span>verb<span class="pl-cce">\"</span>:{<span class="pl-cce">\n\"</span>id<span class="pl-cce">\"</span>:<span class="pl-cce">\"</span>http://adlnet.gov/expapi/verbs/experienced<span class="pl-cce">\"</span>,<span class="pl-cce">\n\"</span>display<span class="pl-cce">\"</span>:{<span class="pl-cce">\"</span>en-US<span class="pl-cce">\"</span>:<span class="pl-cce">\"</span>experienced<span class="pl-cce">\"</span>}<span class="pl-cce">\n</span>},<span class="pl-cce">\n\"</span>object<span class="pl-cce">\"</span>:{<span class="pl-cce">\n\"</span>id<span class="pl-cce">\"</span>:<span class="pl-cce">\"</span>http://example.com/activities/solo-hang-gliding<span class="pl-cce">\"</span>,<span class="pl-cce">\n\"</span>definition<span class="pl-cce">\"</span>: {<span class="pl-cce">\n\"</span>name<span class="pl-cce">\"</span>: {<span class="pl-cce">\"</span>en-US<span class="pl-cce">\"</span>:<span class="pl-cce">\"</span>Hitchhiking<span class="pl-cce">\"</span> }<span class="pl-cce">\n</span>}<span class="pl-cce">\n</span>}<span class="pl-cce">\n</span>}<span class="pl-pds">"</span></span>
+}
+
+<span class="pl-smi">$</span>.<span class="pl-en">ajax</span>(settings).<span class="pl-en">done</span>(<span class="pl-k">function</span> (<span class="pl-smi">response</span>) {
+  <span class="pl-en">console</span>.<span class="pl-c1">log</span>(response);
+});</pre></div>
+
+<p>A Python example:</p>
+
+<div class="highlight highlight-source-python"><pre><span class="pl-k">import</span> http.client
+
+conn <span class="pl-k">=</span> http.client.HTTPConnection(<span class="pl-s"><span class="pl-pds">"</span>127.0.0.1:8678<span class="pl-pds">"</span></span>)
+
+payload <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">"</span>{<span class="pl-cce">\n\"</span>actor<span class="pl-cce">\"</span>: {<span class="pl-cce">\n\"</span>name<span class="pl-cce">\"</span>: <span class="pl-cce">\"</span>Sally<span class="pl-cce">\"</span>,<span class="pl-cce">\n\"</span>mbox<span class="pl-cce">\"</span>: <span class="pl-cce">\"</span>mailto:sally@example.com<span class="pl-cce">\"\n</span>},<span class="pl-cce">\n\"</span>verb<span class="pl-cce">\"</span>: {<span class="pl-cce">\n\"</span>id<span class="pl-cce">\"</span>:<span class="pl-cce">\"</span>http://adlnet.gov/expapi/verbs/experienced<span class="pl-cce">\"</span>,<span class="pl-cce">\n\"</span>display<span class="pl-cce">\"</span>: {<span class="pl-cce">\"</span>en-US<span class="pl-cce">\"</span>: <span class="pl-cce">\"</span>experienced<span class="pl-cce">\"</span>}<span class="pl-cce">\n</span>},<span class="pl-cce">\n\"</span>object<span class="pl-cce">\"</span>: {<span class="pl-cce">\n\"</span>id<span class="pl-cce">\"</span>: <span class="pl-cce">\"</span>http://example.com/activities/solo-hang-gliding<span class="pl-cce">\"</span>,<span class="pl-cce">\n\"</span>definition<span class="pl-cce">\"</span>: {<span class="pl-cce">\n\"</span>name<span class="pl-cce">\"</span>: { <span class="pl-cce">\"</span>en-US<span class="pl-cce">\"</span>:<span class="pl-cce">\"</span>Hitchhiking<span class="pl-cce">\"</span> }<span class="pl-cce">\n</span>}<span class="pl-cce">\n</span>}<span class="pl-cce">\n</span>}<span class="pl-pds">"</span></span>
+
+headers <span class="pl-k">=</span> {
+    <span class="pl-s"><span class="pl-pds">'</span>content-type<span class="pl-pds">'</span></span>: <span class="pl-s"><span class="pl-pds">"</span>application/json<span class="pl-pds">"</span></span>,
+    <span class="pl-s"><span class="pl-pds">'</span>cache-control<span class="pl-pds">'</span></span>: <span class="pl-s"><span class="pl-pds">"</span>no-cache<span class="pl-pds">"</span></span>
+    }
+
+conn.request(<span class="pl-s"><span class="pl-pds">"</span>POST<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>/learn/statement<span class="pl-pds">"</span></span>, payload, headers)
+
+res <span class="pl-k">=</span> conn.getresponse()
+data <span class="pl-k">=</span> res.read()
+
+<span class="pl-c1">print</span>(data.decode(<span class="pl-s"><span class="pl-pds">"</span>utf-8<span class="pl-pds">"</span></span>))</pre></div>
+
+<p>A PHP example:</p>
+
+<div class="highlight highlight-text-html-php"><pre><span class="pl-pse">&lt;?php</span><span class="pl-s1"></span>
+<span class="pl-s1"></span>
+<span class="pl-s1"><span class="pl-smi">$client</span> <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-c1">http\</span><span class="pl-c1">Client</span>;</span>
+<span class="pl-s1"><span class="pl-smi">$request</span> <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-c1">http\Client\</span><span class="pl-c1">Request</span>;</span>
+<span class="pl-s1"></span>
+<span class="pl-s1"><span class="pl-smi">$body</span> <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-c1">http\Message\</span><span class="pl-c1">Body</span>;</span>
+<span class="pl-s1"><span class="pl-smi">$body</span><span class="pl-k">-&gt;</span>append(<span class="pl-s"><span class="pl-pds">'</span>{</span></span>
+<span class="pl-s1"><span class="pl-s">    "actor": {</span></span>
+<span class="pl-s1"><span class="pl-s">        "name": "Sally",</span></span>
+<span class="pl-s1"><span class="pl-s">        "mbox": "mailto:sally@example.com"</span></span>
+<span class="pl-s1"><span class="pl-s">     },</span></span>
+<span class="pl-s1"><span class="pl-s">     "verb": {</span></span>
+<span class="pl-s1"><span class="pl-s">         "id": "http://adlnet.gov/expapi/verbs/experienced",</span></span>
+<span class="pl-s1"><span class="pl-s">         "display": {"en-US": "experienced"}</span></span>
+<span class="pl-s1"><span class="pl-s">         },</span></span>
+<span class="pl-s1"><span class="pl-s">     "object": {</span></span>
+<span class="pl-s1"><span class="pl-s">         "id": "http://example.com/activities/solo-hang-gliding",</span></span>
+<span class="pl-s1"><span class="pl-s">         "definition": {</span></span>
+<span class="pl-s1"><span class="pl-s">             "name": { "en-US": "Hitchhiking" }</span></span>
+<span class="pl-s1"><span class="pl-s">         }</span></span>
+<span class="pl-s1"><span class="pl-s">     }</span></span>
+<span class="pl-s1"><span class="pl-s">}<span class="pl-pds">'</span></span>);</span>
+<span class="pl-s1"></span>
+<span class="pl-s1"><span class="pl-smi">$request</span><span class="pl-k">-&gt;</span>setRequestUrl(<span class="pl-s"><span class="pl-pds">'</span>http://127.0.0.1:8678/learn/statement<span class="pl-pds">'</span></span>);</span>
+<span class="pl-s1"><span class="pl-smi">$request</span><span class="pl-k">-&gt;</span>setRequestMethod(<span class="pl-s"><span class="pl-pds">'</span>POST<span class="pl-pds">'</span></span>);</span>
+<span class="pl-s1"><span class="pl-smi">$request</span><span class="pl-k">-&gt;</span>setBody(<span class="pl-smi">$body</span>);</span>
+<span class="pl-s1"></span>
+<span class="pl-s1"><span class="pl-smi">$request</span><span class="pl-k">-&gt;</span>setHeaders(<span class="pl-c1">array</span>(</span>
+<span class="pl-s1">  <span class="pl-s"><span class="pl-pds">'</span>cache-control<span class="pl-pds">'</span></span> <span class="pl-k">=&gt;</span> <span class="pl-s"><span class="pl-pds">'</span>no-cache<span class="pl-pds">'</span></span>,</span>
+<span class="pl-s1">  <span class="pl-s"><span class="pl-pds">'</span>content-type<span class="pl-pds">'</span></span> <span class="pl-k">=&gt;</span> <span class="pl-s"><span class="pl-pds">'</span>application/json<span class="pl-pds">'</span></span></span>
+<span class="pl-s1">));</span>
+<span class="pl-s1"></span>
+<span class="pl-s1"><span class="pl-smi">$client</span><span class="pl-k">-&gt;</span>enqueue(<span class="pl-smi">$request</span>)<span class="pl-k">-&gt;</span>send();</span>
+<span class="pl-s1"><span class="pl-smi">$response</span> <span class="pl-k">=</span> <span class="pl-smi">$client</span><span class="pl-k">-&gt;</span>getResponse();</span>
+<span class="pl-s1"></span>
+<span class="pl-s1"><span class="pl-c1">echo</span> <span class="pl-smi">$response</span><span class="pl-k">-&gt;</span>getBody();</span></pre></div>
+
+<h2>
+<a id="to-get-a-statement" class="anchor" href="#to-get-a-statement" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>To get a statement</h2>
+
+<p><strong>Case -</strong> I need to know the details of a particular user activity so that I can find who participated and what was really done.</p>
+
+<p>To get details about a statement from the Statement ID, send a GET request.</p>
+
+<div class="highlight highlight-source-httpspec"><pre><span class="pl-k">GET</span><span class="pl-c1"> /learn/statement/&lt;STATEMENT ID&gt;</span></pre></div>
+
+<p>For example:</p>
+
+<div class="highlight highlight-source-httpspec"><pre><span class="pl-k">GET</span><span class="pl-c1"> /learn/statement/a29f2f75-37cb-44b8-83fc-54a812a1d018</span></pre></div>
+
+<p>Example success response:</p>
+
+<div class="highlight highlight-source-json"><pre>{
+  <span class="pl-s"><span class="pl-pds">"</span>Statement<span class="pl-pds">"</span></span>:[
+    <span class="pl-s"><span class="pl-pds">"</span>a29f2f75-37cb-44b8-83fc-54a812a1d018<span class="pl-pds">"</span></span>,
+    <span class="pl-s"><span class="pl-pds">"</span>{<span class="pl-cce">\"</span>objectType<span class="pl-cce">\"</span>:<span class="pl-cce">\"</span>Agent<span class="pl-cce">\"</span>,<span class="pl-cce">\"</span>name<span class="pl-cce">\"</span>:<span class="pl-cce">\"</span>Joe Schmoe<span class="pl-cce">\"</span>,<span class="pl-cce">\"</span>mbox<span class="pl-cce">\"</span>:<span class="pl-cce">\"</span>mailto:joe@example.com<span class="pl-cce">\"</span>}<span class="pl-pds">"</span></span>,
+    <span class="pl-s"><span class="pl-pds">"</span>{<span class="pl-cce">\"</span>id<span class="pl-cce">\"</span>:<span class="pl-cce">\"</span>http://adlnet.gov/expapi/verbs/completed<span class="pl-cce">\"</span>,<span class="pl-cce">\"</span>display<span class="pl-cce">\"</span>:{<span class="pl-cce">\"</span>en-US<span class="pl-cce">\"</span>:<span class="pl-cce">\"</span>completed<span class="pl-cce">\"</span>}}<span class="pl-pds">"</span></span>,
+    <span class="pl-s"><span class="pl-pds">"</span>{<span class="pl-cce">\"</span>objectType<span class="pl-cce">\"</span>:<span class="pl-cce">\"</span>Activity<span class="pl-cce">\"</span>,<span class="pl-cce">\"</span>id<span class="pl-cce">\"</span>:<span class="pl-cce">\"</span>http://www.example.com/activities/001<span class="pl-cce">\"</span>,<span class="pl-cce">\"</span>definition<span class="pl-cce">\"</span>:{<span class="pl-cce">\"</span>name<span class="pl-cce">\"</span>:{<span class="pl-cce">\"</span>en-US<span class="pl-cce">\"</span>:<span class="pl-cce">\"</span>Example              Activity<span class="pl-cce">\"</span>},<span class="pl-cce">\"</span>type<span class="pl-cce">\"</span>:<span class="pl-cce">\"</span>http://adlnet.gov/expapi/activities/course<span class="pl-cce">\"</span>}}<span class="pl-pds">"</span></span>,
+        <span class="pl-c1">1455111694507</span>
+  ]
+}</pre></div>
+
+<p>A JavaScript example:</p>
+
+<div class="highlight highlight-source-js"><pre><span class="pl-k">var</span> settings <span class="pl-k">=</span> {
+  <span class="pl-s"><span class="pl-pds">"</span>async<span class="pl-pds">"</span></span><span class="pl-k">:</span> <span class="pl-c1">true</span>,
+  <span class="pl-s"><span class="pl-pds">"</span>crossDomain<span class="pl-pds">"</span></span><span class="pl-k">:</span> <span class="pl-c1">true</span>,
+  <span class="pl-s"><span class="pl-pds">"</span>url<span class="pl-pds">"</span></span><span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">"</span>http://127.0.0.1:8678/learn/statement/9e746713-055e-45de-a1d0-6044509bc52d<span class="pl-pds">"</span></span>,
+  <span class="pl-s"><span class="pl-pds">"</span>method<span class="pl-pds">"</span></span><span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">"</span>GET<span class="pl-pds">"</span></span>,
+  <span class="pl-s"><span class="pl-pds">"</span>headers<span class="pl-pds">"</span></span><span class="pl-k">:</span> {
+    <span class="pl-s"><span class="pl-pds">"</span>content-type<span class="pl-pds">"</span></span><span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">"</span>application/json<span class="pl-pds">"</span></span>,
+    <span class="pl-s"><span class="pl-pds">"</span>cache-control<span class="pl-pds">"</span></span><span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">"</span>no-cache<span class="pl-pds">"</span></span>
+  }
+}
+
+<span class="pl-smi">$</span>.<span class="pl-en">ajax</span>(settings).<span class="pl-en">done</span>(<span class="pl-k">function</span> (<span class="pl-smi">response</span>) {
+  <span class="pl-en">console</span>.<span class="pl-c1">log</span>(response);
+});</pre></div>
+
+<p>A Python example:</p>
+
+<div class="highlight highlight-source-python"><pre><span class="pl-k">import</span> http.client
+
+conn <span class="pl-k">=</span> http.client.HTTPConnection(<span class="pl-s"><span class="pl-pds">"</span>127.0.0.1:8678<span class="pl-pds">"</span></span>)
+
+headers <span class="pl-k">=</span> {
+    <span class="pl-s"><span class="pl-pds">'</span>content-type<span class="pl-pds">'</span></span>: <span class="pl-s"><span class="pl-pds">"</span>application/json<span class="pl-pds">"</span></span>,
+    <span class="pl-s"><span class="pl-pds">'</span>cache-control<span class="pl-pds">'</span></span>: <span class="pl-s"><span class="pl-pds">"</span>no-cache<span class="pl-pds">"</span></span>
+    }
+
+conn.request(<span class="pl-s"><span class="pl-pds">"</span>GET<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>/learn/statement/9e746713-055e-45de-a1d0-6044509bc52d<span class="pl-pds">"</span></span>, <span class="pl-v">headers</span><span class="pl-k">=</span>headers)
+
+res <span class="pl-k">=</span> conn.getresponse()
+data <span class="pl-k">=</span> res.read()
+
+<span class="pl-c1">print</span>(data.decode(<span class="pl-s"><span class="pl-pds">"</span>utf-8<span class="pl-pds">"</span></span>))</pre></div>
+
+<p>A PHP example:</p>
+
+<div class="highlight highlight-text-html-php"><pre><span class="pl-pse">&lt;?php</span><span class="pl-s1"></span>
+<span class="pl-s1"></span>
+<span class="pl-s1"><span class="pl-smi">$client</span> <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-c1">http\</span><span class="pl-c1">Client</span>;</span>
+<span class="pl-s1"><span class="pl-smi">$request</span> <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-c1">http\Client\</span><span class="pl-c1">Request</span>;</span>
+<span class="pl-s1"></span>
+<span class="pl-s1"><span class="pl-smi">$request</span><span class="pl-k">-&gt;</span>setRequestUrl(<span class="pl-s"><span class="pl-pds">'</span>http://127.0.0.1:8678/learn/statement/9e746713-055e-45de-a1d0-6044509bc52d<span class="pl-pds">'</span></span>);</span>
+<span class="pl-s1"><span class="pl-smi">$request</span><span class="pl-k">-&gt;</span>setRequestMethod(<span class="pl-s"><span class="pl-pds">'</span>GET<span class="pl-pds">'</span></span>);</span>
+<span class="pl-s1"><span class="pl-smi">$request</span><span class="pl-k">-&gt;</span>setHeaders(<span class="pl-c1">array</span>(</span>
+<span class="pl-s1">  <span class="pl-s"><span class="pl-pds">'</span>cache-control<span class="pl-pds">'</span></span> <span class="pl-k">=&gt;</span> <span class="pl-s"><span class="pl-pds">'</span>no-cache<span class="pl-pds">'</span></span>,</span>
+<span class="pl-s1">  <span class="pl-s"><span class="pl-pds">'</span>content-type<span class="pl-pds">'</span></span> <span class="pl-k">=&gt;</span> <span class="pl-s"><span class="pl-pds">'</span>application/json<span class="pl-pds">'</span></span></span>
+<span class="pl-s1">));</span>
+<span class="pl-s1"></span>
+<span class="pl-s1"><span class="pl-smi">$client</span><span class="pl-k">-&gt;</span>enqueue(<span class="pl-smi">$request</span>)<span class="pl-k">-&gt;</span>send();</span>
+<span class="pl-s1"><span class="pl-smi">$response</span> <span class="pl-k">=</span> <span class="pl-smi">$client</span><span class="pl-k">-&gt;</span>getResponse();</span>
+<span class="pl-s1"></span>
+<span class="pl-s1"><span class="pl-c1">echo</span> <span class="pl-smi">$response</span><span class="pl-k">-&gt;</span>getBody();</span></pre></div>
+
+<h2>
+<a id="to-get-the-statement-time" class="anchor" href="#to-get-the-statement-time" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>To get the statement time</h2>
+
+<p><strong>Case -</strong> I need to know when the user performed an activity.</p>
+
+<p>To get the statement creation time, send a GET request.</p>
+
+<div class="highlight highlight-source-httpspec"><pre><span class="pl-k">GET</span><span class="pl-c1"> /learn/findtimeofstatement/&lt;STATEMENT ID&gt;</span></pre></div>
+
+<p>For example:</p>
+
+<div class="highlight highlight-source-httpspec"><pre><span class="pl-k">GET</span><span class="pl-c1"> /learn/findtimeofstatement/a29f2f75-37cb-44b8-83fc-54a812a1d018</span></pre></div>
+
+<p>Example success response:</p>
+
+<div class="highlight highlight-source-json"><pre>{<span class="pl-s"><span class="pl-pds">"</span>Statement Time<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>Feb 12,2016 19:11<span class="pl-pds">"</span></span>}</pre></div>
+
+<p>A JavaScript example:</p>
+
+<div class="highlight highlight-source-js"><pre><span class="pl-k">var</span> settings <span class="pl-k">=</span> {
+  <span class="pl-s"><span class="pl-pds">"</span>async<span class="pl-pds">"</span></span><span class="pl-k">:</span> <span class="pl-c1">true</span>,
+  <span class="pl-s"><span class="pl-pds">"</span>crossDomain<span class="pl-pds">"</span></span><span class="pl-k">:</span> <span class="pl-c1">true</span>,
+  <span class="pl-s"><span class="pl-pds">"</span>url<span class="pl-pds">"</span></span><span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">"</span>http://127.0.0.1:8678/learn/findtimeofstatement/fdcfa8aa-9214-4a56-ade5-f9e655fcdbeb<span class="pl-pds">"</span></span>,
+  <span class="pl-s"><span class="pl-pds">"</span>method<span class="pl-pds">"</span></span><span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">"</span>GET<span class="pl-pds">"</span></span>,
+  <span class="pl-s"><span class="pl-pds">"</span>headers<span class="pl-pds">"</span></span><span class="pl-k">:</span> {
+    <span class="pl-s"><span class="pl-pds">"</span>content-type<span class="pl-pds">"</span></span><span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">"</span>application/json<span class="pl-pds">"</span></span>,
+    <span class="pl-s"><span class="pl-pds">"</span>cache-control<span class="pl-pds">"</span></span><span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">"</span>no-cache<span class="pl-pds">"</span></span>
+  }
+}
+
+<span class="pl-smi">$</span>.<span class="pl-en">ajax</span>(settings).<span class="pl-en">done</span>(<span class="pl-k">function</span> (<span class="pl-smi">response</span>) {
+  <span class="pl-en">console</span>.<span class="pl-c1">log</span>(response);
+});</pre></div>
+
+<p>A Python example:</p>
+
+<div class="highlight highlight-source-python"><pre><span class="pl-k">import</span> http.client
+
+conn <span class="pl-k">=</span> http.client.HTTPConnection(<span class="pl-s"><span class="pl-pds">"</span>127.0.0.1:8678<span class="pl-pds">"</span></span>)
+
+headers <span class="pl-k">=</span> {
+    <span class="pl-s"><span class="pl-pds">'</span>content-type<span class="pl-pds">'</span></span>: <span class="pl-s"><span class="pl-pds">"</span>application/json<span class="pl-pds">"</span></span>,
+    <span class="pl-s"><span class="pl-pds">'</span>cache-control<span class="pl-pds">'</span></span>: <span class="pl-s"><span class="pl-pds">"</span>no-cache<span class="pl-pds">"</span></span>,
+    <span class="pl-s"><span class="pl-pds">'</span>postman-token<span class="pl-pds">'</span></span>: <span class="pl-s"><span class="pl-pds">"</span>276654ff-f336-5fcd-eefa-00305bf667c1<span class="pl-pds">"</span></span>
+    }
+
+conn.request(<span class="pl-s"><span class="pl-pds">"</span>GET<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>/learn/findtimeofstatement/fdcfa8aa-9214-4a56-ade5-f9e655fcdbeb<span class="pl-pds">"</span></span>, <span class="pl-v">headers</span><span class="pl-k">=</span>headers)
+
+res <span class="pl-k">=</span> conn.getresponse()
+data <span class="pl-k">=</span> res.read()
+
+<span class="pl-c1">print</span>(data.decode(<span class="pl-s"><span class="pl-pds">"</span>utf-8<span class="pl-pds">"</span></span>))</pre></div>
+
+<p>A PHP example:</p>
+
+<div class="highlight highlight-text-html-php"><pre><span class="pl-pse">&lt;?php</span><span class="pl-s1"></span>
+<span class="pl-s1"></span>
+<span class="pl-s1"><span class="pl-smi">$client</span> <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-c1">http\</span><span class="pl-c1">Client</span>;</span>
+<span class="pl-s1"><span class="pl-smi">$request</span> <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-c1">http\Client\</span><span class="pl-c1">Request</span>;</span>
+<span class="pl-s1"></span>
+<span class="pl-s1"><span class="pl-smi">$request</span><span class="pl-k">-&gt;</span>setRequestUrl(<span class="pl-s"><span class="pl-pds">'</span>http://127.0.0.1:8678/learn/findtimeofstatement/fdcfa8aa-9214-4a56-ade5-f9e655fcdbeb<span class="pl-pds">'</span></span>);</span>
+<span class="pl-s1"><span class="pl-smi">$request</span><span class="pl-k">-&gt;</span>setRequestMethod(<span class="pl-s"><span class="pl-pds">'</span>GET<span class="pl-pds">'</span></span>);</span>
+<span class="pl-s1"><span class="pl-smi">$request</span><span class="pl-k">-&gt;</span>setHeaders(<span class="pl-c1">array</span>(</span>
+<span class="pl-s1">  <span class="pl-s"><span class="pl-pds">'</span>postman-token<span class="pl-pds">'</span></span> <span class="pl-k">=&gt;</span> <span class="pl-s"><span class="pl-pds">'</span>3365320b-0279-3c90-e0f7-1667ea862fbd<span class="pl-pds">'</span></span>,</span>
+<span class="pl-s1">  <span class="pl-s"><span class="pl-pds">'</span>cache-control<span class="pl-pds">'</span></span> <span class="pl-k">=&gt;</span> <span class="pl-s"><span class="pl-pds">'</span>no-cache<span class="pl-pds">'</span></span>,</span>
+<span class="pl-s1">  <span class="pl-s"><span class="pl-pds">'</span>content-type<span class="pl-pds">'</span></span> <span class="pl-k">=&gt;</span> <span class="pl-s"><span class="pl-pds">'</span>application/json<span class="pl-pds">'</span></span></span>
+<span class="pl-s1">));</span>
+<span class="pl-s1"></span>
+<span class="pl-s1"><span class="pl-smi">$client</span><span class="pl-k">-&gt;</span>enqueue(<span class="pl-smi">$request</span>)<span class="pl-k">-&gt;</span>send();</span>
+<span class="pl-s1"><span class="pl-smi">$response</span> <span class="pl-k">=</span> <span class="pl-smi">$client</span><span class="pl-k">-&gt;</span>getResponse();</span>
+<span class="pl-s1"></span>
+<span class="pl-s1"><span class="pl-c1">echo</span> <span class="pl-smi">$response</span><span class="pl-k">-&gt;</span>getBody();</span></pre></div>
+
+<h2>
+<a id="to-find-all-statements-for-an-actor" class="anchor" href="#to-find-all-statements-for-an-actor" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>To find all statements for an actor</h2>
+
+<p><strong>Case -</strong> How has this user learned something? Is there any way I can enumerate a list of all his activities?</p>
+
+<p>To find all statements for an actor, send a POST request.</p>
+
+<div class="highlight highlight-source-httpspec"><pre><span class="pl-k">POST</span><span class="pl-c1"> /learn/statement/findstatementsforactor</span></pre></div>
+
+<p>with the following JSON request body:</p>
+
+<div class="highlight highlight-source-json"><pre>{
+
+<span class="pl-s"><span class="pl-pds">"</span>actor<span class="pl-pds">"</span></span>: {
+  <span class="pl-s"><span class="pl-pds">"</span>objectType<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>User<span class="pl-pds">"</span></span>,
+  <span class="pl-s"><span class="pl-pds">"</span>name<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>Abel Osbert<span class="pl-pds">"</span></span>,
+  <span class="pl-s"><span class="pl-pds">"</span>mbox<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>mailto:aosbert@example.com<span class="pl-pds">"</span></span>
+  }
+}</pre></div>
+
+<p>Example success response:</p>
+
+<div class="highlight highlight-source-json"><pre>{<span class="pl-s"><span class="pl-pds">"</span>Statements<span class="pl-pds">"</span></span>: [
+    <span class="pl-s"><span class="pl-pds">"</span>36318877-208c-4ab5-a42b-a1ca3f45ca52<span class="pl-pds">"</span></span>,
+    <span class="pl-s"><span class="pl-pds">"</span>e2cd0c7a-a2e6-451c-b2ef-7fdb8031bef7<span class="pl-pds">"</span></span>,
+    <span class="pl-s"><span class="pl-pds">"</span>5ba063d8-61c3-4200-8326-eaa6f566e353<span class="pl-pds">"</span></span>,
+    <span class="pl-s"><span class="pl-pds">"</span>e2bf61b9-dd8f-4ece-97d3-094e57f35cad<span class="pl-pds">"</span></span>,
+    <span class="pl-s"><span class="pl-pds">"</span>5daa8b09-d982-42e6-9236-5883da2da08f<span class="pl-pds">"</span></span>,
+    <span class="pl-s"><span class="pl-pds">"</span>25017371-1d76-4134-be23-79938c4050a9<span class="pl-pds">"</span></span>,
+    <span class="pl-s"><span class="pl-pds">"</span>a29f2f75-37cb-44b8-83fc-54a812a1d018<span class="pl-pds">"</span></span>
+]}</pre></div>
+
+<p>Every Statement denotes a discreet, recorded, learning action of the user. Use <code>findstatementsforactor</code> endpoint to get the Statement details. Note that you can pass any JSON payload as part of actor, verb, and object.</p>
+
+<p>A Python example:</p>
+
+<div class="highlight highlight-source-python"><pre><span class="pl-k">import</span> http.client
+
+conn <span class="pl-k">=</span> http.client.HTTPConnection(<span class="pl-s"><span class="pl-pds">"</span>127.0.0.1:8678<span class="pl-pds">"</span></span>)
+
+headers <span class="pl-k">=</span> {
+    <span class="pl-s"><span class="pl-pds">'</span>content-type<span class="pl-pds">'</span></span>: <span class="pl-s"><span class="pl-pds">"</span>application/json<span class="pl-pds">"</span></span>,
+    <span class="pl-s"><span class="pl-pds">'</span>cache-control<span class="pl-pds">'</span></span>: <span class="pl-s"><span class="pl-pds">"</span>no-cache<span class="pl-pds">"</span></span>
+    }
+
+conn.request(<span class="pl-s"><span class="pl-pds">"</span>GET<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>/learn/statement/9e746713-055e-45de-a1d0-6044509bc52d<span class="pl-pds">"</span></span>, <span class="pl-v">headers</span><span class="pl-k">=</span>headers)
+
+res <span class="pl-k">=</span> conn.getresponse()
+data <span class="pl-k">=</span> res.read()
+
+<span class="pl-c1">print</span>(data.decode(<span class="pl-s"><span class="pl-pds">"</span>utf-8<span class="pl-pds">"</span></span>))</pre></div>
+
+<p>A PHP example:</p>
+
+<div class="highlight highlight-text-html-php"><pre><span class="pl-pse">&lt;?php</span><span class="pl-s1"></span>
+<span class="pl-s1"></span>
+<span class="pl-s1"><span class="pl-smi">$curl</span> <span class="pl-k">=</span> <span class="pl-c1">curl_init</span>();</span>
+<span class="pl-s1"></span>
+<span class="pl-s1"><span class="pl-c1">curl_setopt_array</span>(<span class="pl-smi">$curl</span>, <span class="pl-c1">array</span>(</span>
+<span class="pl-s1">  <span class="pl-c1">CURLOPT_PORT</span> <span class="pl-k">=&gt;</span> <span class="pl-s"><span class="pl-pds">"</span>8678<span class="pl-pds">"</span></span>,</span>
+<span class="pl-s1">  <span class="pl-c1">CURLOPT_URL</span> <span class="pl-k">=&gt;</span> <span class="pl-s"><span class="pl-pds">"</span>http://127.0.0.1:8678/learn/findstatementsforactor<span class="pl-pds">"</span></span>,</span>
+<span class="pl-s1">  <span class="pl-c1">CURLOPT_RETURNTRANSFER</span> <span class="pl-k">=&gt;</span> <span class="pl-c1">true</span>,</span>
+<span class="pl-s1">  <span class="pl-c1">CURLOPT_ENCODING</span> <span class="pl-k">=&gt;</span> <span class="pl-s"><span class="pl-pds">"</span><span class="pl-pds">"</span></span>,</span>
+<span class="pl-s1">  <span class="pl-c1">CURLOPT_MAXREDIRS</span> <span class="pl-k">=&gt;</span> <span class="pl-c1">10</span>,</span>
+<span class="pl-s1">  <span class="pl-c1">CURLOPT_TIMEOUT</span> <span class="pl-k">=&gt;</span> <span class="pl-c1">30</span>,</span>
+<span class="pl-s1">  <span class="pl-c1">CURLOPT_HTTP_VERSION</span> <span class="pl-k">=&gt;</span> <span class="pl-c1">CURL_HTTP_VERSION_1_1</span>,</span>
+<span class="pl-s1">  <span class="pl-c1">CURLOPT_CUSTOMREQUEST</span> <span class="pl-k">=&gt;</span> <span class="pl-s"><span class="pl-pds">"</span>POST<span class="pl-pds">"</span></span>,</span>
+<span class="pl-s1">  <span class="pl-c1">CURLOPT_POSTFIELDS</span> <span class="pl-k">=&gt;</span> <span class="pl-s"><span class="pl-pds">"</span>{<span class="pl-cce">\n\"</span>actor<span class="pl-cce">\"</span>: {<span class="pl-cce">\n\"</span>name<span class="pl-cce">\"</span>: <span class="pl-cce">\"</span>Sally Glider<span class="pl-cce">\"</span>,<span class="pl-cce">\n\"</span>mbox<span class="pl-cce">\"</span>:<span class="pl-cce">\"</span>mailto:sally@example.com<span class="pl-cce">\"\n</span>},<span class="pl-cce">\n\"</span>verb<span class="pl-cce">\"</span>: {<span class="pl-cce">\n\"</span>id<span class="pl-cce">\"</span>:<span class="pl-cce">\"</span>http://adlnet.gov/expapi/verbs/experienced<span class="pl-cce">\"</span>,<span class="pl-cce">\n\"</span>display<span class="pl-cce">\"</span>: {<span class="pl-cce">\"</span>en-US<span class="pl-cce">\"</span>:<span class="pl-cce">\"</span>experienced<span class="pl-cce">\"</span>}<span class="pl-cce">\n</span>},<span class="pl-cce">\n\"</span>object<span class="pl-cce">\"</span>: {<span class="pl-cce">\n\"</span>id<span class="pl-cce">\"</span>:<span class="pl-cce">\"</span>http://example.com/activities/solo-hang-gliding<span class="pl-cce">\"</span>,<span class="pl-cce">\n\"</span>definition<span class="pl-cce">\"</span>: {<span class="pl-cce">\n\"</span>name<span class="pl-cce">\"</span>: {<span class="pl-cce">\"</span>en-US<span class="pl-cce">\"</span>: <span class="pl-cce">\"</span>Solo Hang Gliding<span class="pl-cce">\"</span>}<span class="pl-cce">\n</span>}<span class="pl-cce">\n</span>}<span class="pl-cce">\n</span>}<span class="pl-pds">"</span></span>,</span>
+<span class="pl-s1">  <span class="pl-c1">CURLOPT_HTTPHEADER</span> <span class="pl-k">=&gt;</span> <span class="pl-c1">array</span>(</span>
+<span class="pl-s1">    <span class="pl-s"><span class="pl-pds">"</span>cache-control: no-cache<span class="pl-pds">"</span></span>,</span>
+<span class="pl-s1">    <span class="pl-s"><span class="pl-pds">"</span>content-type: application/json<span class="pl-pds">"</span></span></span>
+<span class="pl-s1">  ),</span>
+<span class="pl-s1">));</span>
+<span class="pl-s1"></span>
+<span class="pl-s1"><span class="pl-smi">$response</span> <span class="pl-k">=</span> <span class="pl-c1">curl_exec</span>(<span class="pl-smi">$curl</span>);</span>
+<span class="pl-s1"><span class="pl-smi">$err</span> <span class="pl-k">=</span> <span class="pl-c1">curl_error</span>(<span class="pl-smi">$curl</span>);</span>
+<span class="pl-s1"></span>
+<span class="pl-s1"><span class="pl-c1">curl_close</span>(<span class="pl-smi">$curl</span>);</span>
+<span class="pl-s1"></span>
+<span class="pl-s1"><span class="pl-k">if</span> (<span class="pl-smi">$err</span>) {</span>
+<span class="pl-s1">  <span class="pl-c1">echo</span> <span class="pl-s"><span class="pl-pds">"</span>cURL Error #:<span class="pl-pds">"</span></span> <span class="pl-k">.</span> <span class="pl-smi">$err</span>;</span>
+<span class="pl-s1">} <span class="pl-k">else</span> {</span>
+<span class="pl-s1">  <span class="pl-c1">echo</span> <span class="pl-smi">$response</span>;</span>
+<span class="pl-s1">}</span></pre></div>
+
+<p>Or, simply cURL it up:</p>
+
+<pre lang="curl"><code>curl -X POST -H "Content-Type: application/json" -H "Cache-Control: no-cache"
+ -d '{
+    "actor": {
+        "name": "Sally Glider",
+        "mbox": "mailto:sally@example.com"
+     },
+     "verb": {
+         "id": "http://adlnet.gov/expapi/verbs/experienced",
+         "display": {"en-US": "experienced"}
+         },
+     "object": {
+         "id": "http://example.com/activities/solo-hang-gliding",
+         "definition": {
+             "name": { "en-US": "Solo Hang Gliding" }
+         }
+     }
+}' "http://127.0.0.1:8678/learn/findstatementsforactor"
+</code></pre>
+
+      <footer class="site-footer">
+        <span class="site-footer-owner"><a href="https://github.com/fermatjen/dlrs">DLRS Developer Guide</a> is maintained by <a href="https://github.com/fermatjen">fermatjen</a>.</span>
+
+        <span class="site-footer-credits">This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the <a href="https://github.com/jasonlong/cayman-theme">Cayman theme</a> by <a href="https://twitter.com/jasonlong">Jason Long</a>.</span>
+      </footer>
+
+    </section>
+
+  
+  </body>
+</html>
