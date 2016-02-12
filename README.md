@@ -3,8 +3,7 @@ DLRS (Distributed Learning Record Store) allows you to quickly record and retrie
 
 This software is still under development. Don't even think of using DLRS in production (for now).
 
-## How to test DLRS
-
+## Building from source
 Before you begin, [install Gradle](https://docs.gradle.org/current/userguide/installation.html) for your platform.
 
 On Mac, it is as simple as:
@@ -27,7 +26,8 @@ $ gradle build
 
 You need to have [Java SE 1.8](http://www.oracle.com/technetwork/java/javase/downloads/index.html) or higher and [Gradle](http://gradle.org). 
 
-If you just want to test DLRS without building DLRS from the sources, directly run:
+## Testing DLRS
+If you just want to test DLRS without building it from the sources, directly run:
 
 ```
 $ ./gradlew run
@@ -57,5 +57,5 @@ When the DLRS server is running, open the following page to test:
 ```
 http://localhost:8678/learn
 ```
-# API Usage
+## API Usage
 For building clients that can work with DLRS, see the [Developer Guide](docs/API.md).
