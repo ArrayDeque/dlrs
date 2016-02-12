@@ -3,11 +3,13 @@ DLRS exposes a few endpoints for your apps to store and retrieve atomic user act
 
 A 'Statement' can be sent to a DLRS with 3 primary payload details:
 
-* *Actor* - Who is this user?
-* *Verb* - What did he do?
-* *Object* - What is he learning?
+* **Actor** - Who is this user?
+* **Verb** - What did he do?
+* **Object** - What is he learning?
 
 ## To record a statement
+**Case -** A user is going through a learning activity and I want to record what he is doing so I can analyze the progress later.
+
 To record a Statement, send a POST request.
 
 ```http
@@ -43,6 +45,8 @@ with the following JSON request body:
 This API returns a Statement ID.
 
 ## To get a statement
+**Case -** I need to know the details of a particular user activity so that I can find who participated and what was really done.
+
 To get details about a statement from the Statement ID, send a GET request.
 
 ```http
@@ -70,6 +74,8 @@ Example success response:
 ```
 
 ## To find all statements for an actor
+**Case -** How has this user learned something? Is there any way I can enumerate a list of all his activities?
+
 To find all statements for an actor, send a POST request.
 
 ```http
@@ -140,11 +146,10 @@ curl_setopt_array($curl, array(
   CURLOPT_TIMEOUT => 30,
   CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
   CURLOPT_CUSTOMREQUEST => "POST",
-  CURLOPT_POSTFIELDS => "{\n    \"actor\": {\n        \"name\": \"Sally Glider\",\n        \"mbox\": \"mailto:sally@example.com\"\n     },\n     \"verb\": {\n         \"id\": \"http://adlnet.gov/expapi/verbs/experienced\",\n         \"display\": {\"en-US\": \"experienced\"}\n         },\n     \"object\": {\n         \"id\": \"http://example.com/activities/solo-hang-gliding\",\n         \"definition\": {\n             \"name\": { \"en-US\": \"Solo Hang Gliding\" }\n         }\n     }\n}",
+  CURLOPT_POSTFIELDS => "{\n\"actor\": {\n\"name\": \"Sally Glider\",\n\"mbox\":\"mailto:sally@example.com\"\n},\n\"verb\": {\n\"id\":\"http://adlnet.gov/expapi/verbs/experienced\",\n\"display\": {\"en-US\":\"experienced\"}\n},\n\"object\": {\n\"id\":\"http://example.com/activities/solo-hang-gliding\",\n\"definition\": {\n\"name\": {\"en-US\": \"Solo Hang Gliding\"}\n}\n}\n}",
   CURLOPT_HTTPHEADER => array(
     "cache-control: no-cache",
-    "content-type: application/json",
-    "postman-token: ab1722ac-39c2-7bb8-7a8f-ce493248b7ab"
+    "content-type: application/json"
   ),
 ));
 
