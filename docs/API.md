@@ -44,6 +44,69 @@ with the following JSON request body:
 ```
 This API returns a Statement ID.
 
+A Python example:
+
+```python
+import http.client
+
+conn = http.client.HTTPConnection("127.0.0.1:8678")
+
+payload = "{\n\"actor\": {\n\"name\": \"Sally\",\n\"mbox\": \"mailto:sally@example.com\"\n},\n\"verb\": {\n\"id\":\"http://adlnet.gov/expapi/verbs/experienced\",\n\"display\": {\"en-US\": \"experienced\"}\n},\n\"object\": {\n\"id\": \"http://example.com/activities/solo-hang-gliding\",\n\"definition\": {\n\"name\": { \"en-US\":\"Hitchhiking\" }\n}\n}\n}"
+
+headers = {
+    'content-type': "application/json",
+    'cache-control': "no-cache"
+    }
+
+conn.request("POST", "/learn/statement", payload, headers)
+
+res = conn.getresponse()
+data = res.read()
+
+print(data.decode("utf-8"))
+```
+
+A PHP example:
+
+```PHP
+<?php
+
+$client = new http\Client;
+$request = new http\Client\Request;
+
+$body = new http\Message\Body;
+$body->append('{
+    "actor": {
+        "name": "Sally",
+        "mbox": "mailto:sally@example.com"
+     },
+     "verb": {
+         "id": "http://adlnet.gov/expapi/verbs/experienced",
+         "display": {"en-US": "experienced"}
+         },
+     "object": {
+         "id": "http://example.com/activities/solo-hang-gliding",
+         "definition": {
+             "name": { "en-US": "Hitchhiking" }
+         }
+     }
+}');
+
+$request->setRequestUrl('http://127.0.0.1:8678/learn/statement');
+$request->setRequestMethod('POST');
+$request->setBody($body);
+
+$request->setHeaders(array(
+  'cache-control' => 'no-cache',
+  'content-type' => 'application/json'
+));
+
+$client->enqueue($request)->send();
+$response = $client->getResponse();
+
+echo $response->getBody();
+```
+
 ## To get a statement
 **Case -** I need to know the details of a particular user activity so that I can find who participated and what was really done.
 
@@ -71,6 +134,47 @@ Example success response:
         1455111694507
   ]
 }
+```
+
+A Python example:
+
+```python
+import http.client
+
+conn = http.client.HTTPConnection("127.0.0.1:8678")
+
+headers = {
+    'content-type': "application/json",
+    'cache-control': "no-cache"
+    }
+
+conn.request("GET", "/learn/statement/9e746713-055e-45de-a1d0-6044509bc52d", headers=headers)
+
+res = conn.getresponse()
+data = res.read()
+
+print(data.decode("utf-8"))
+```
+
+A PHP example:
+
+```php
+<?php
+
+$client = new http\Client;
+$request = new http\Client\Request;
+
+$request->setRequestUrl('http://127.0.0.1:8678/learn/statement/9e746713-055e-45de-a1d0-6044509bc52d');
+$request->setRequestMethod('GET');
+$request->setHeaders(array(
+  'cache-control' => 'no-cache',
+  'content-type' => 'application/json'
+));
+
+$client->enqueue($request)->send();
+$response = $client->getResponse();
+
+echo $response->getBody();
 ```
 
 ## To find all statements for an actor
