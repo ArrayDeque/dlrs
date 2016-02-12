@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.dlrs.handlers.http;
 
 import com.dlrs.actor.Actor;
@@ -31,7 +30,9 @@ import java.io.OutputStream;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLDecoder;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.StringTokenizer;
 import java.util.UUID;
@@ -83,12 +84,12 @@ public class DLRSContextHandler implements HttpHandler {
         String requestURI = t.getRequestURI().toString().trim();
         String requestMethod = t.getRequestMethod().trim();
 
-        System.out.println("REQUESTURI:" + requestURI + " METHOD:" + t.getRequestMethod() + " BODY:" + buff);
+        //System.out.println("REQUESTURI:" + requestURI + " METHOD:" + t.getRequestMethod() + " BODY:" + buff);
         if (requestURI.contains("/statement") && requestMethod.contains("GET")) {
             //Send the Statement Info
             int index = requestURI.lastIndexOf("/");
             String SID = requestURI.substring(index + 1, requestURI.length());
-            System.out.println(SID);
+            //System.out.println(SID);
             if (statementMap.containsKey(SID)) {
                 Statement stmt = (Statement) statementMap.get(SID);
                 ArrayList stmtArray = new ArrayList();
@@ -113,6 +114,34 @@ public class DLRSContextHandler implements HttpHandler {
                 os.write(hello.getBytes());
                 os.close();
             }
+        } else if (requestURI.contains("/findtimeofstatement") && requestMethod.contains("GET")) {
+            //Find the time of statement
+            int index = requestURI.lastIndexOf("/");
+            String SID = requestURI.substring(index + 1, requestURI.length());
+            //System.out.println(SID);
+            if (statementMap.containsKey(SID)) {
+                Statement stmt = (Statement) statementMap.get(SID);
+
+                SimpleDateFormat sdf = new SimpleDateFormat("MMM dd,yyyy HH:mm");
+                Date resultdate = new Date(stmt.getTimestamp());
+                String stmtTime = sdf.format(resultdate);
+                //Send response
+                org.json.JSONObject obj = new org.json.JSONObject();
+                obj.put("Statement Time", stmtTime);
+                String response = obj.toString(4);
+                t.sendResponseHeaders(200, response.length());
+                OutputStream os = t.getResponseBody();
+                os.write(response.getBytes());
+                os.close();
+            } else {
+                ///NO Records
+                String hello = "No statement records found for that ID!";
+                t.sendResponseHeaders(200, hello.length());
+                OutputStream os = t.getResponseBody();
+                os.write(hello.getBytes());
+                os.close();
+            }
+
         } else if (requestURI.contains("/findstatementsforactor") && requestMethod.contains("POST")) {
             //GET STATEMENTS FOR ACTORS
             JSONObject jsonObject = new JSONObject(buff.toString().trim());
@@ -154,7 +183,7 @@ public class DLRSContextHandler implements HttpHandler {
 
         } else if (requestURI.contains("/statement") && requestMethod.contains("POST")) {
             //POST STATEMENT
-            System.out.println("POST STATEMENTS");
+            //System.out.println("POST STATEMENTS");
             JSONObject jsonObject = new JSONObject(buff.toString().trim());
 
             JSONObject actorJSON = jsonObject.getJSONObject("actor");
