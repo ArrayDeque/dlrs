@@ -1,4 +1,4 @@
-# API Usage
+# Developer Guide
 DLRS exposes a few endpoints for your apps to store and retrieve atomic user activities. Every 'measurable' user activity is represented by a 'Statement' or action. 
 
 A 'Statement' can be sent to a DLRS with 3 primary payload details:
@@ -48,6 +48,19 @@ with the following JSON request body:
 }
 ```
 This API returns a Statement ID.
+
+Note that DLRS looks for 3 JSON fragments:
+
+```java
+  JSONObject actorJSON = jsonObject.getJSONObject("actor");
+  JSONObject verbJSON = jsonObject.getJSONObject("verb");
+  JSONObject objectJSON = jsonObject.getJSONObject("object");
+```
+
+So, ensure that the JSON payload in the request body is well-formed and contains these 3 mandatory fragments - actor, verb, and object.
+
+When you record a statement, the statement is stored in an in-memory TreeMap that gets persisted to disk when JVM shutsdown. Statements are not immediately written to disk. Hence, you need to do a clean server shutodwon to activate the JVM shutdownhooks that will write the TreeMaps to disk.
+
 
 A JavaScript example:
 
