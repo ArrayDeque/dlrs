@@ -7,6 +7,11 @@ A 'Statement' can be sent to a DLRS with 3 primary payload details:
 * **Verb** - What did he do?
 * **Object** - What is he learning?
 
+Available endpoints:
+* [**POST /learn/statement**](To record a statement)
+* [**GET /learn/statement/<STATEMENTID>**](To get a statement)
+* [**POST /learn/statement/findstatementsforactor**](To find all statements for an actor)
+
 ## To record a statement
 **Case -** A user is going through a learning activity and I want to record what he is doing so I can analyze the progress later.
 
