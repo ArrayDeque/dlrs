@@ -30,11 +30,13 @@ import java.io.OutputStream;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLDecoder;
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.StringTokenizer;
+import java.util.TimeZone;
 import java.util.UUID;
 import org.json.JSONObject;
 import org.mapdb.DB;
@@ -122,9 +124,12 @@ public class DLRSContextHandler implements HttpHandler {
             if (statementMap.containsKey(SID)) {
                 Statement stmt = (Statement) statementMap.get(SID);
 
-                SimpleDateFormat sdf = new SimpleDateFormat("MMM dd,yyyy HH:mm");
+                TimeZone tz = TimeZone.getTimeZone("UTC");
+                DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mmZ");
                 Date resultdate = new Date(stmt.getTimestamp());
-                String stmtTime = sdf.format(resultdate);
+                df.setTimeZone(tz);
+                String stmtTime = df.format(resultdate);
+
                 //Send response
                 org.json.JSONObject obj = new org.json.JSONObject();
                 obj.put("Statement Time", stmtTime);
