@@ -95,11 +95,32 @@ public class DLRSContextHandler implements HttpHandler {
             if (statementMap.containsKey(SID)) {
                 Statement stmt = (Statement) statementMap.get(SID);
                 ArrayList stmtArray = new ArrayList();
-                stmtArray.add(stmt.getStatementUUID());
-                stmtArray.add(stmt.getActorJSON());
-                stmtArray.add(stmt.getVerbJSON());
-                stmtArray.add(stmt.getObjectJSON());
-                stmtArray.add(stmt.getTimestamp());
+                
+                org.json.JSONObject uuidObj = new org.json.JSONObject();
+                uuidObj.put("UUID", stmt.getStatementUUID());
+                stmtArray.add(uuidObj);
+                
+                org.json.JSONObject actorObj = new org.json.JSONObject();
+                actorObj.put("actor", stmt.getActorJSON());
+                stmtArray.add(actorObj);
+                
+                org.json.JSONObject verbObj = new org.json.JSONObject();
+                verbObj.put("verb", stmt.getVerbJSON());
+                stmtArray.add(verbObj);
+                
+                org.json.JSONObject objObj = new org.json.JSONObject();
+                objObj.put("object", stmt.getObjectJSON());
+                stmtArray.add(objObj);
+                
+                org.json.JSONObject timeObj = new org.json.JSONObject();
+                TimeZone tz = TimeZone.getTimeZone("UTC");
+                DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mmZ");
+                Date resultdate = new Date(stmt.getTimestamp());
+                df.setTimeZone(tz);
+                String stmtTime = df.format(resultdate);
+                timeObj.put("timestamp", stmtTime);
+                stmtArray.add(timeObj);
+                
                 //Send response
                 org.json.JSONObject obj = new org.json.JSONObject();
                 obj.put("Statement", stmtArray);
