@@ -6,16 +6,23 @@ This software is still under development. Don't even think of using DLRS in prod
 ## Building
 Before you begin, you need to install [Java SE 1.8](http://www.oracle.com/technetwork/java/javase/downloads/index.html) or higher.
 
+First, clone this repo:
+
+```shell
+$ git clone https://github.com/fermatjen/dlrs.git
+```
+
 To build DLRS from the sources, run:
 
-```
+```shell
+$ cd dlrs
 $ ./gradlew assemble
 ```
 
 ## Running
 If you just want to test DLRS without building it from the sources, directly run:
 
-```
+```shell
 $ ./gradlew run
 ```
 You will see the following output:
